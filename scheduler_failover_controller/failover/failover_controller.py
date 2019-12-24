@@ -95,7 +95,10 @@ class FailoverController:
                     self.logger.info("Pausing for 2 seconds to allow the Scheduler to Start")
                     time.sleep(2)
                     if not self.is_scheduler_running(active_scheduler_node):
-                        self.logger.warning("Failed to restart Scheduler on Active Scheduler Node '" +str(active_scheduler_node) + "'")
+                        self.logger.warning(
+                            "Failed to restart Scheduler on Active Scheduler Node '" + str(active_scheduler_node) + "'")
+                        self.logger.warning(
+                            "Last Output from start command: {}".format(self.LATEST_FAILED_START_MESSAGE))
                         self.logger.warning("Starting to search for a new Active Scheduler Node")
                         is_successful = False
                         for standby_node in self.get_standby_nodes(active_scheduler_node):

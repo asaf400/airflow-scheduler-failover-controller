@@ -39,7 +39,7 @@ metadata_service_zookeeper_nodes = localhost:2181
 poll_frequency = """ + str(DEFAULT_POLL_FREQUENCY) + """
 
 # Command to use when trying to start a Scheduler instance on a node
-airflow_scheduler_start_command = export AIRFLOW_HOME=""" + str(DEFAULT_AIRFLOW_HOME_DIR) + """;{};nohup airflow scheduler >> ~/airflow/logs/scheduler.logs &
+airflow_scheduler_start_command = export AIRFLOW_HOME=""" + str(DEFAULT_AIRFLOW_HOME_DIR) + """;{};nohup /entrypoint.sh scheduler >> ~/airflow/logs/scheduler.logs &
 
 # Command to use when trying to stop a Scheduler instance on a node
 airflow_scheduler_stop_command = for pid in `ps -ef | grep "airflow scheduler" | awk '{{print $2}}'` \; do kill -9 $pid \; done
