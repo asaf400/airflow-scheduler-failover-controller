@@ -20,6 +20,7 @@ class FailoverController:
         self.airflow_scheduler_start_command = configuration.get_airflow_scheduler_start_command()
         self.airflow_scheduler_stop_command = configuration.get_airflow_scheduler_stop_command()
         self.poll_frequency = configuration.get_poll_frequency()
+        self.cold_start_delay = configuration.get_cold_start_delay()
         self.retry_count_before_alerting = configuration.get_retry_count_before_alerting()
         self.command_runner = command_runner
         self.metadata_service = metadata_service
@@ -90,10 +91,12 @@ class FailoverController:
                         self.metadata_service.set_active_scheduler_node(active_scheduler_node)
 
                 if not self.is_scheduler_running(active_scheduler_node):
-                    self.logger.warning("Scheduler is not running on Active Scheduler Node '" + str(active_scheduler_node) + "'")
+                    self.logger.warning(
+                        "Scheduler is not running on Active Scheduler Node '" + str(active_scheduler_node) + "'")
                     self.startup_scheduler(active_scheduler_node)
-                    self.logger.info("Pausing for 2 seconds to allow the Scheduler to Start")
-                    time.sleep(2)
+                    self.logger.info(
+                        "Pausing for {} seconds to allow the Scheduler to Start".format(self.cold_start_delay))
+                    time.sleep(self.cold_start_delay)
                     if not self.is_scheduler_running(active_scheduler_node):
                         self.logger.warning(
                             "Failed to restart Scheduler on Active Scheduler Node '" + str(active_scheduler_node) + "'")
@@ -102,7 +105,8 @@ class FailoverController:
                         self.logger.warning("Starting to search for a new Active Scheduler Node")
                         is_successful = False
                         for standby_node in self.get_standby_nodes(active_scheduler_node):
-                            self.logger.warning("Trying to startup Scheduler on STANDBY node '" + str(standby_node) + "'")
+                            self.logger.warning(
+                                "Trying to startup Scheduler on STANDBY node '" + str(standby_node) + "'")
                             self.startup_scheduler(standby_node)
                             if self.is_scheduler_running(standby_node):
                                 is_successful = True

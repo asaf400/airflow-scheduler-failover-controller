@@ -15,6 +15,7 @@ def get_airflow_home_dir():
 DEFAULT_AIRFLOW_HOME_DIR = get_airflow_home_dir()
 DEFAULT_METADATA_SERVICE_TYPE = "SQLMetadataService"
 DEFAULT_POLL_FREQUENCY = 10
+DEFAULT_COLD_START_DELAY = 5
 DEFAULT_LOGGING_LEVEL = "INFO"
 DEFAULT_LOGS_ROTATE_WHEN = "midnight"
 DEFAULT_LOGS_ROTATE_BACKUP_COUNT = 7
@@ -37,6 +38,8 @@ metadata_service_zookeeper_nodes = localhost:2181
 
 # Frequency that the Scheduler Failover Controller polls to see if the scheduler is running (in seconds)
 poll_frequency = """ + str(DEFAULT_POLL_FREQUENCY) + """
+
+cold_start_delay = """ + str(DEFAULT_COLD_START_DELAY) + """
 
 # Command to use when trying to start a Scheduler instance on a node
 airflow_scheduler_start_command = export AIRFLOW_HOME=""" + str(DEFAULT_AIRFLOW_HOME_DIR) + """;{};nohup /entrypoint.sh scheduler >> ~/airflow/logs/scheduler.logs &
@@ -255,6 +258,9 @@ class Configuration:
 
     def get_poll_frequency(self):
         return int(self.get_scheduler_failover_config("POLL_FREQUENCY", DEFAULT_POLL_FREQUENCY))
+
+    def get_cold_start_delay(self):
+        return int(self.get_scheduler_failover_config("COLD_START_DELAY", DEFAULT_COLD_START_DELAY))
 
     def get_airflow_scheduler_start_command(self):
         return self.get_scheduler_failover_config("AIRFLOW_SCHEDULER_START_COMMAND")
